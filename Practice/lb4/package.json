@@ -1,0 +1,11 @@
+{
+  "name": "lab4",
+  "version": "1.0.0",
+  "main": "blockchain.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "sha256": "^0.2.0"
+  }
+}
