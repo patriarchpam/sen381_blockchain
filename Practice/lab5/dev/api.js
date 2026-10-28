@@ -1,13 +1,13 @@
 let express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-// const Blockchain = require('./blockchain');
+const Blockchain = require('./blockchain');
 
-// const bitcoin = new Blockchain();
+const bitcoin = new Blockchain();
 
 // Middleware to parse JSON and urlencoded request bodies
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Home endpoint for testing
 app.get('/', function (req, res) {
