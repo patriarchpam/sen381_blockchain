@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenSpace Finance | OpenSpace Ledger — Ethical Asset-Backed Murabaha Blockchain</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --os-green: #123B2E;
+      --os-green-dark: #0c2920;
+      --os-green-mid: #1c5443;
+      --os-gold: #E0B04F;
+      --os-gold-dark: #B8892B;
+      --os-cream: #FBF3DD;
+      --os-bg: #F3F5F1;
+      --os-card-alt: #E8EDE9;
+      --os-border: #D3DCD5;
+      --os-text: #1D2A26;
+      --os-muted: #5D6B65;
+      --os-red: #A63A2A;
+      --os-red-bg: #fdedea;
+      --os-white: #FFFFFF;
+      --shadow-sm: 0 2px 8px rgba(18, 59, 46, 0.06);
+      --shadow-md: 0 6px 20px rgba(18, 59, 46, 0.10);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--os-bg);
+      color: var(--os-text);
+      font-family: 'Calibri', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1,
+    h2,
+    h3,
+    .serif-title {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      letter-spacing: -0.01em;
+    }
+
+    /* TOP HEADER */
+    header {
+      background: linear-gradient(135deg, var(--os-green) 0%, var(--os-green-dark) 100%);
+      color: var(--os-white);
+      padding: 1rem 2rem;
+      border-bottom: 3px solid var(--os-gold);
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-emblem {
+      width: 46px;
+      height: 46px;
+      border-radius: 10px;
+      background: var(--os-gold);
+      color: var(--os-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      font-size: 1.45rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .brand-titles h1 {
+      font-size: 1.5rem;
+      color: var(--os-white);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-titles h1 span.badge-domain {
+      font-family: 'Calibri', sans-serif;
+      font-size: 0.78rem;
+      background: rgba(224, 176, 79, 0.2);
+      color: var(--os-gold);
+      border: 1px solid var(--os-gold);
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .brand-subtitle {
+      color: var(--os-gold);
+      font-size: 0.92rem;
+      margin-top: 2px;
+    }
+
+    .academic-meta {
+      text-align: right;
+      font-size: 0.82rem;
+      color: var(--os-card-alt);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      border-left: 3px solid var(--os-gold);
+    }
+
+    .academic-meta strong {
+      color: var(--os-gold);
+    }
+
+    /* CHAIN STATUS & ROLE SWITCHER BAR */
+    .sub-bar {
+      background: var(--os-card-alt);
+      border-bottom: 1px solid var(--os-border);
+      padding: 0.75rem 2rem;
+    }
+
+    .sub-bar-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .role-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .role-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--os-muted);
+      margin-right: 0.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .role-pill {
+      background: var(--os-white);
+      border: 1.5px solid var(--os-border);
+      color: var(--os-text);
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .role-pill:hover {
+      border-color: var(--os-green);
+      background: var(--os-cream);
+    }
+
+    .role-pill.active {
+      background: var(--os-green);
+      color: var(--os-white);
+      border-color: var(--os-green);
+      box-shadow: 0 2px 6px rgba(18, 59, 46, 0.25);
+    }
+
+    .role-pill.attacker.active {
+      background: var(--os-red);
+      border-color: var(--os-red);
+    }
+
+    .role-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--os-gold);
+    }
+
+    .chain-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.83rem;
+      flex-wrap: wrap;
+    }
+
+    .telemetry-chip {
+      background: var(--os-white);
+      border: 1px solid var(--os-border);
+      padding: 0.32rem 0.7rem;
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--os-green);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .telemetry-chip span.val {
+      color: var(--os-gold-dark);
+      font-family: Consolas, monospace;
+      font-weight: 700;
+    }
+
+    .btn-web3 {
+      background: var(--os-gold);
+      color: var(--os-green);
+      border: none;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-web3:hover {
+      background: var(--os-gold-dark);
+      color: var(--os-white);
+    }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      max-width: 1440px;
+      width: 100%;
+      margin: 1.25rem auto;
+      padding: 0 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* DEMO WALKTHROUGH STRIP */
+    .demo-strip {
+      background: var(--os-cream);
+      border: 1.5px solid var(--os-gold);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .demo-strip-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      color: var(--os-green);
+      font-size: 0.92rem;
+    }
+
+    .demo-steps {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    .demo-btn {
+      background: var(--os-white);
+      border: 1px solid var(--os-gold-dark);
+      color: var(--os-green);
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .demo-btn:hover {
+      background: var(--os-green);
+      color: var(--os-white);
+      border-color: var(--os-green);
+    }
+
+    .demo-btn.danger {
+      border-color: var(--os-red);
+      color: var(--os-red);
+    }
+
+    .demo-btn.danger:hover {
+      background: var(--os-red);
+      color: var(--os-white);
+    }
+
+    .demo-btn.reset {
+      background: var(--os-card-alt);
+      border-color: var(--os-muted);
+      color: var(--os-muted);
+    }
+
+    /* STATE MACHINE PIPELINE */
+    .state-pipeline-card {
+      background: var(--os-white);
+      border: 1px solid var(--os-border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.4rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pipeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pipeline-header h2 {
+      font-size: 1.1rem;
+      color: var(--os-green);
+    }
+
+    .pipeline-nodes {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.65rem;
+    }
+
+    @media (max-width: 980px) {
+      .pipeline-nodes {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .state-node {
+      background: var(--os-bg);
+      border: 2px solid var(--os-border);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .state-node .enum-idx {
+      font-size: 0.7rem;
+      font-family: Consolas, monospace;
+      color: var(--os-muted);
+      display: block;
+    }
+
+    .state-node .state-name {
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      font-size: 0.98rem;
+      color: var(--os-text);
+      margin: 2px 0;
+    }
+
+    .state-node .state-rule {
+      font-size: 0.74rem;
+      color: var(--os-muted);
+    }
+
+    .state-node.active {
+      background: var(--os-green);
+      border-color: var(--os-gold);
+      color: var(--os-white);
+      box-shadow: 0 4px 12px rgba(18, 59, 46, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .state-node.active .state-name,
+    .state-node.active .enum-idx,
+    .state-node.active .state-rule {
+      color: var(--os-white);
+    }
+
+    .state-node.active .enum-idx {
+      color: var(--os-gold);
+    }
+
+    .state-node.danger-active {
+      background: var(--os-red);
+      border-color: var(--os-red);
+      color: var(--os-white);
+    }
+
+    .state-node.danger-active .state-name,
+    .state-node.danger-active .enum-idx,
+    .state-node.danger-active .state-rule {
+      color: var(--os-white);
+    }
+
+    /* 3-COLUMN WORKSPACE GRID */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr 370px;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1200px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-card {
+      background: var(--os-white);
+      border: 1px solid var(--os-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .panel-header {
+      background: var(--os-green);
+      color: var(--os-white);
+      padding: 0.75rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--os-gold);
+    }
+
+    .panel-header h3 {
+      font-size: 0.98rem;
+      font-weight: bold;
+    }
+
+    .panel-header .tag {
+      font-size: 0.72rem;
+      background: rgba(224, 176, 79, 0.22);
+      color: var(--os-gold);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+
+    .panel-body {
+      padding: 1.1rem;
+    }
+
+    /* FORM & ACTION CONTROLS */
+    .active-wallet-banner {
+      background: var(--os-cream);
+      border: 1px solid var(--os-gold);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .active-wallet-banner .w-role {
+      font-weight: 700;
+      color: var(--os-green);
+      font-size: 0.92rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .active-wallet-banner .w-addr {
+      font-family: Consolas, monospace;
+      font-size: 0.78rem;
+      color: var(--os-muted);
+      margin-top: 2px;
+    }
+
+    .active-wallet-banner .w-bal {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--os-gold-dark);
+    }
+
+    .fn-box {
+      border: 1px solid var(--os-border);
+      background: var(--os-bg);
+      border-radius: 8px;
+      padding: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .fn-box:last-child {
+      margin-bottom: 0;
+    }
+
+    .fn-title {
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--os-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.45rem;
+    }
+
+    .fn-modifier {
+      font-size: 0.7rem;
+      background: var(--os-card-alt);
+      border: 1px solid var(--os-border);
+      color: var(--os-muted);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .fn-desc {
+      font-size: 0.79rem;
+      color: var(--os-muted);
+      margin-bottom: 0.65rem;
+    }
+
+    .form-row {
+      margin-bottom: 0.55rem;
+    }
+
+    .form-row label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--os-text);
+      margin-bottom: 2px;
+    }
+
+    .form-row input,
+    .form-row select {
+      width: 100%;
+      padding: 0.42rem 0.6rem;
+      border: 1px solid var(--os-border);
+      border-radius: 6px;
+      font-size: 0.83rem;
+      background: var(--os-white);
+      color: var(--os-text);
+    }
+
+    .btn-action {
+      width: 100%;
+      background: var(--os-green);
+      color: var(--os-white);
+      border: none;
+      padding: 0.52rem 0.85rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-action:hover {
+      background: var(--os-green-mid);
+    }
+
+    .btn-action.gold {
+      background: var(--os-gold);
+      color: var(--os-green);
+    }
+
+    .btn-action.gold:hover {
+      background: var(--os-gold-dark);
+      color: var(--os-white);
+    }
+
+    .btn-action.danger {
+      background: var(--os-red);
+      color: var(--os-white);
+    }
+
+    .btn-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    /* CENTER DEAL INSPECTOR */
+    .deal-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .metric-tile {
+      background: var(--os-bg);
+      border: 1px solid var(--os-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+
+    .metric-tile .m-label {
+      font-size: 0.74rem;
+      color: var(--os-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .metric-tile .m-val {
+      font-family: 'Georgia', serif;
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--os-green);
+      margin-top: 2px;
+    }
+
+    .metric-tile .m-sub {
+      font-size: 0.73rem;
+      color: var(--os-gold-dark);
+      font-weight: 600;
+    }
+
+    .progress-section {
+      margin-bottom: 1rem;
+      background: var(--os-card-alt);
+      border: 1px solid var(--os-border);
+      border-radius: 8px;
+      padding: 0.85rem;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .progress-bar-bg {
+      height: 10px;
+      background: var(--os-white);
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--os-border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--os-green), var(--os-gold));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* STRUCT TABLE */
+    .struct-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    .struct-table th,
+    .struct-table td {
+      padding: 0.48rem 0.65rem;
+      border-bottom: 1px solid var(--os-border);
+      text-align: left;
+    }
+
+    .struct-table th {
+      background: var(--os-card-alt);
+      color: var(--os-green);
+      font-weight: 700;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .struct-table td.mono {
+      font-family: Consolas, monospace;
+      font-size: 0.79rem;
+    }
+
+    /* WALLETS & LEDGER TABLE */
+    .wallet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .wallet-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.65rem;
+      background: var(--os-bg);
+      border: 1px solid var(--os-border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+
+    .wallet-item.current {
+      border-color: var(--os-gold-dark);
+      background: var(--os-cream);
+    }
+
+    .w-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .w-name {
+      font-weight: 700;
+      color: var(--os-text);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .kyc-tag {
+      font-size: 0.66rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .kyc-tag.yes {
+      background: #d8f3dc;
+      color: var(--os-green);
+    }
+
+    .kyc-tag.no {
+      background: var(--os-red-bg);
+      color: var(--os-red);
+    }
+
+    /* EVENT LOG STREAM */
+    .event-stream {
+      max-height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .event-card {
+      background: var(--os-bg);
+      border-left: 4px solid var(--os-green);
+      border-top: 1px solid var(--os-border);
+      border-right: 1px solid var(--os-border);
+      border-bottom: 1px solid var(--os-border);
+      padding: 0.55rem 0.7rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.79rem;
+    }
+
+    .event-card.revert {
+      border-left-color: var(--os-red);
+      background: var(--os-red-bg);
+    }
+
+    .event-card.gold-ev {
+      border-left-color: var(--os-gold-dark);
+      background: var(--os-cream);
+    }
+
+    .ev-top {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-family: Consolas, monospace;
+      color: var(--os-green);
+      margin-bottom: 2px;
+    }
+
+    .event-card.revert .ev-top {
+      color: var(--os-red);
+    }
+
+    .ev-detail {
+      color: var(--os-text);
+      margin-bottom: 2px;
+    }
+
+    .ev-hash {
+      font-family: Consolas, monospace;
+      font-size: 0.7rem;
+      color: var(--os-muted);
+    }
+
+    /* SUPABASE OFF-CHAIN DRAWER */
+    .offchain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .offchain-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .offchain-box {
+      background: var(--os-bg);
+      border: 1px dashed var(--os-muted);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .offchain-box h4 {
+      color: var(--os-green);
+      font-size: 0.86rem;
+      margin-bottom: 0.35rem;
+    }
+
+    /* TOAST BANNER */
+    #toastBanner {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      max-width: 420px;
+      background: var(--os-green);
+      color: var(--os-white);
+      border-left: 5px solid var(--os-gold);
+      padding: 0.85rem 1.15rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      font-size: 0.85rem;
+      z-index: 9999;
+      display: none;
+    }
+
+    #toastBanner.revert {
+      background: var(--os-red);
+      border-left-color: var(--os-cream);
+    }
+
+    footer {
+      background: var(--os-green);
+      color: var(--os-card-alt);
+      text-align: center;
+      padding: 0.9rem;
+      font-size: 0.8rem;
+      border-top: 2px solid var(--os-gold);
+      margin-top: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="brand-group">
+        <div class="brand-emblem">OS</div>
+        <div class="brand-titles">
+          <h1>
+            OpenSpace Ledger
+            <span class="badge-domain">openspace.finance</span>
+          </h1>
+          <div class="brand-subtitle">A blockchain layer for ethical, asset-backed Murabaha SME financing</div>
+        </div>
+      </div>
+      <div class="academic-meta">
+        <div><strong>Business-Block:</strong> OpenSpace Finance &nbsp;|&nbsp; <strong>Course:</strong> SEN 381
+          (Blockchain Elective)</div>
+        <div><strong>Student:</strong> Pam Patriarch (VUG/SEN/24/12478) &nbsp;|&nbsp; <strong>Lecturer:</strong> Dr.
+          Valentine Chibueze</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ROLE SWITCHER & TELEMETRY BAR -->
+  <div class="sub-bar">
+    <div class="sub-bar-inner">
+      <div class="role-selector-group">
+        <span class="role-label">Active Wallet Role:</span>
+        <button class="role-pill" onclick="switchRole('admin')" id="role-admin">
+          <span class="role-dot"></span> Admin
+        </button>
+        <button class="role-pill active" onclick="switchRole('sme')" id="role-sme">
+          <span class="role-dot"></span> SME (Borrower)
+        </button>
+        <button class="role-pill" onclick="switchRole('board1')" id="role-board1">
+          <span class="role-dot"></span> Board #1
+        </button>
+        <button class="role-pill" onclick="switchRole('board2')" id="role-board2">
+          <span class="role-dot"></span> Board #2
+        </button>
+        <button class="role-pill" onclick="switchRole('board3')" id="role-board3">
+          <span class="role-dot"></span> Board #3
+        </button>
+        <button class="role-pill" onclick="switchRole('investor1')" id="role-investor1">
+          <span class="role-dot"></span> Investor 1 (40%)
+        </button>
+        <button class="role-pill" onclick="switchRole('investor2')" id="role-investor2">
+          <span class="role-dot"></span> Investor 2 (60%)
+        </button>
+        <button class="role-pill" onclick="switchRole('vendor')" id="role-vendor">
+          <span class="role-dot"></span> Vendor (Asset Seller)
+        </button>
+        <button class="role-pill attacker" onclick="switchRole('attacker')" id="role-attacker">
+          <span class="role-dot" style="background:#fff"></span> Tamper / Non-KYC
+        </button>
+      </div>
+
+      <div class="chain-telemetry">
+        <div class="telemetry-chip">Contract: <span class="val">OpenSpaceMurabaha.sol</span></div>
+        <div class="telemetry-chip">Markup: <span class="val">10% (1000 bps)</span></div>
+        <div class="telemetry-chip">Board Gate: <span class="val">2 of 3 Sigs</span></div>
+        <div class="telemetry-chip">Block: <span class="val" id="blockNumDisplay">#104</span></div>
+        <div class="telemetry-chip">Chain Clock: <span class="val" id="clockDisplay">Day 0</span></div>
+        <button class="btn-web3" onclick="connectMetaMask()" id="btnConnectWallet">Connect MetaMask / EVM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="main-container">
+
+    <!-- 5-MINUTE DEFENSE ONE-CLICK DEMO BAR -->
+    <div class="demo-strip">
+      <div class="demo-strip-title">
+        <span>⚡ 5-Minute Defense Walkthrough (Slide 13 &amp; 17 Worked Example: ₦2,000,000 Cost + 10% Markup =
+          ₦2,200,000):</span>
+      </div>
+      <div class="demo-steps">
+        <button class="demo-btn" onclick="runDemoStep(1)">1. SME Apply (₦2M)</button>
+        <button class="demo-btn" onclick="runDemoStep(2)">2. Board 2/3 Approve (Locks ₦2.2M)</button>
+        <button class="demo-btn" onclick="runDemoStep(3)">3. Investors Fund (Auto-Pays Vendor)</button>
+        <button class="demo-btn" onclick="runDemoStep(4)">4. SME Repay Instalment (₦550k)</button>
+        <button class="demo-btn" onclick="runDemoStep(5)">5. Investors Claim Pro-Rata</button>
+        <button class="demo-btn danger" onclick="runDemoStep(6)">6. Tamper Test (Revert!)</button>
+        <button class="demo-btn reset" onclick="resetChainSimulation()">↺ Reset Chain</button>
+      </div>
+    </div>
+
+    <!-- DEAL STATUS STATE MACHINE PIPELINE (SLIDE 7) -->
+    <div class="state-pipeline-card">
+      <div class="pipeline-header">
+        <h2>On-Chain Deal State Machine (Deal #1 — Status Enum)</h2>
+        <div style="font-size:0.82rem; color:var(--os-muted);">
+          Only valid role transactions transition states; illegal jumps immediately revert.
+        </div>
+      </div>
+      <div class="pipeline-nodes">
+        <div class="state-node" id="st-Applied">
+          <span class="enum-idx">Status(0)</span>
+          <div class="state-name">Applied</div>
+          <div class="state-rule">applyForFinancing()</div>
+        </div>
+        <div class="state-node" id="st-Approved">
+          <span class="enum-idx">Status(1)</span>
+          <div class="state-name">Approved</div>
+          <div class="state-rule">approve() [2 of 3 Sigs]</div>
+        </div>
+        <div class="state-node" id="st-Funded">
+          <span class="enum-idx">Status(2)</span>
+          <div class="state-name">Funded</div>
+          <div class="state-rule">fund() == cost → Vendor</div>
+        </div>
+        <div class="state-node" id="st-Closed">
+          <span class="enum-idx">Status(3)</span>
+          <div class="state-name">Closed</div>
+          <div class="state-rule">Final repay() → Ownership</div>
+        </div>
+        <div class="state-node" id="st-Defaulted">
+          <span class="enum-idx">Status(4)</span>
+          <div class="state-name">Defaulted</div>
+          <div class="state-rule">markDefault() [0% Penalty]</div>
+        </div>
+        <div class="state-node" id="st-Rejected">
+          <span class="enum-idx">Status(5)</span>
+          <div class="state-name">Rejected</div>
+          <div class="state-rule">reject() [Board Gate]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3-COLUMN GRID -->
+    <div class="workspace-grid">
+
+      <!-- LEFT COLUMN: ROLE-SPECIFIC SMART CONTRACT FUNCTIONS -->
+      <div>
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>Role Contract Controls</h3>
+            <span class="tag" id="activeRoleBadge">SME (Borrower)</span>
+          </div>
+          <div class="panel-body">
+
+            <!-- Active Wallet Info -->
+            <div class="active-wallet-banner">
+              <div class="w-role">
+                <span id="bannerRoleName">SME (Borrower)</span>
+                <span class="kyc-tag yes" id="bannerKycBadge">KYC Whitelisted</span>
+              </div>
+              <div class="w-addr" id="bannerAddress">0xSME0...1104</div>
+              <div class="w-bal">Balance: <span id="bannerBalance">₦5,000,000</span> osNGN</div>
+            </div>
+
+            <!-- Dynamic Function Controls Container -->
+            <div id="roleFunctionsContainer"></div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER COLUMN: ON-CHAIN DEAL STRUCT & FLOW OF FUNDS -->
+      <div>
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>On-Chain Deal Struct Inspector (`deals[1]`)</h3>
+            <span class="tag" id="dealAssetRefTag">No Active Deal</span>
+          </div>
+          <div class="panel-body">
+
+            <!-- Key Financial Metrics -->
+            <div class="deal-metrics-grid">
+              <div class="metric-tile">
+                <div class="m-label">Asset Cost (`d.cost`)</div>
+                <div class="m-val" id="mCost">₦0</div>
+                <div class="m-sub">Paid directly to Vendor</div>
+              </div>
+              <div class="metric-tile">
+                <div class="m-label">Locked Total (`d.total`)</div>
+                <div class="m-val" id="mTotal">₦0</div>
+                <div class="m-sub" id="mMarkupSub">Cost + 10% Fixed Markup</div>
+              </div>
+              <div class="metric-tile">
+                <div class="m-label">Outstanding (`outstanding(1)`)</div>
+                <div class="m-val" id="mOutstanding">₦0</div>
+                <div class="m-sub" id="mInstalmentSub">0 / 0 Instalments Paid</div>
+              </div>
+            </div>
+
+            <!-- Pool Funding Progress -->
+            <div class="progress-section">
+              <div class="progress-top">
+                <span>1. Investor Pool Funding (`d.raised` / `d.cost`)</span>
+                <span id="fundingProgressText">₦0 / ₦0 (0%)</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="fundingProgressBar"></div>
+              </div>
+              <div style="font-size:0.75rem; color:var(--os-muted); margin-top:4px;" id="vendorPayoutNote">
+                Escrow Rule: Contract holds investor funds until 100% of cost is reached, then transfers atomically to
+                Vendor.
+              </div>
+            </div>
+
+            <!-- SME Repayment Progress -->
+            <div class="progress-section">
+              <div class="progress-top">
+                <span>2. SME Instalment Repayment (`d.repaid` / `d.total`)</span>
+                <span id="repayProgressText">₦0 / ₦0 (0%)</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="repayProgressBar"></div>
+              </div>
+              <div style="font-size:0.75rem; color:var(--os-muted); margin-top:4px;">
+                Pro-Rata Rule: Investors call <code>claim(1)</code> at any time to pull their exact share of repayments.
+              </div>
+            </div>
+
+            <!-- Raw Solidity Struct Fields Table -->
+            <table class="struct-table">
+              <thead>
+                <tr>
+                  <th>Solidity Field</th>
+                  <th>Value in `deals[1]`</th>
+                  <th> Rule / Guard</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">sme / vendor</td>
+                  <td class="mono" id="tbSmeVendor">—</td>
+                  <td>Direct vendor payout prevents diversion</td>
+                </tr>
+                <tr>
+                  <td class="mono">approvals / threshold</td>
+                  <td class="mono" id="tbApprovals">0 / 2 signatures</td>
+                  <td>2-of-3 Board multi-sig locks `d.total`</td>
+                </tr>
+                <tr>
+                  <td class="mono">installments / paidCount</td>
+                  <td class="mono" id="tbInstallments">0 / 0</td>
+                  <td>Last instalment clears rounding remainder</td>
+                </tr>
+                <tr>
+                  <td class="mono">Investor 1 Stake (40%)</td>
+                  <td class="mono" id="tbInv1">Stake: ₦0 | Claimed: ₦0</td>
+                  <td>Entitled: <span id="tbInv1Entitled">₦0</span></td>
+                </tr>
+                <tr>
+                  <td class="mono">Investor 2 Stake (60%)</td>
+                  <td class="mono" id="tbInv2">Stake: ₦0 | Claimed: ₦0</td>
+                  <td>Entitled: <span id="tbInv2Entitled">₦0</span></td>
+                </tr>
+                <tr>
+                  <td class="mono">Next Due + Grace (7d)</td>
+                  <td class="mono" id="tbDueGrace">—</td>
+                  <td>Default adds 0% compounding penalty</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+        <!-- OFF-CHAIN SUPABASE & TRUSTED INPUTS LAYER (SLIDE 8 & 12) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>Hybrid Architecture: Off-Chain Supabase &amp; Legal Layer (Slide 8 &amp; 12)</h3>
+            <span class="tag">Off-Chain Data Model</span>
+          </div>
+          <div class="panel-body">
+            <div class="offchain-grid">
+              <div class="offchain-box">
+                <h4>1. Vendor Invoice &amp; Hash</h4>
+                <div><strong>Ref:</strong> <code id="offAssetRef">INV-2026-SOLAR-01</code></div>
+                <div><strong>SHA-256:</strong> <code>0x8f9c...4e21</code></div>
+                <div style="margin-top:4px; color:var(--os-muted);">PDF stored in Supabase Storage; hash anchored
+                  on-chain in <code>assetRef</code>.</div>
+              </div>
+              <div class="offchain-box">
+                <h4>2. KYC &amp; Corporate Registry</h4>
+                <div><strong>CAC / BVN Status:</strong> Verified</div>
+                <div><strong>Admin Gate:</strong> <code>setKyc(addr, true)</code></div>
+                <div style="margin-top:4px; color:var(--os-muted);">PII stays private in Supabase; only boolean
+                  whitelist lives on-chain.</div>
+              </div>
+              <div class="offchain-box">
+                <h4>3. Off-Chain Title Transfer</h4>
+                <div><strong>Trigger:</strong> <code>Closed(id)</code> Event</div>
+                <div><strong>Title Status:</strong> <span id="offTitleStatus"
+                    style="font-weight:700; color:var(--os-gold-dark);">Held by Financier Pool</span></div>
+                <div style="margin-top:4px; color:var(--os-muted);">Legal ownership transfers to SME once final
+                  instalment fires <code>Closed</code>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: ERC20 BALANCES & IMMUTABLE EVENT STREAM -->
+      <div>
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>ERC-20 Settlement Token Ledger (`osNGN`)</h3>
+            <span class="tag">IERC20 Balances</span>
+          </div>
+          <div class="panel-body">
+            <div class="wallet-list" id="walletBalancesList"></div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3>Immutable EVM Event &amp; Revert Log</h3>
+            <span class="tag" id="eventCountTag">0 Events</span>
+          </div>
+          <div class="panel-body">
+            <div class="event-stream" id="eventStreamContainer"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastBanner"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    OpenSpace Finance (OpenSpace Ledger) — Solidity 0.8.26 Murabaha Smart Contract Interface &nbsp;|&nbsp;
+    Pam Patriarch (VUG/SEN/24/12478) &nbsp;|&nbsp; Lecturer: Dr. Valentine Chibueze
+  </footer>
+
+  <script>
+    // ============================================================================
+    // OPENSPACE MURABAHA DETERMINISTIC EVM STATE ENGINE (SOLIDITY 0.8.26 MIRROR)
+    // ============================================================================
+    const MARKUP_BPS = 1000; // 10.00% fixed markup
+    const THRESHOLD = 2;     // 2-of-3 Board signatures
+    const GRACE_DAYS = 7;    // 7-day grace period
+
+    let currentRole = 'sme';
+    let blockNumber = 104;
+    let chainDay = 0;
+
+    let wallets = {};
+    let deal = null;
+    let eventsLog = [];
+
+    function initSimulationState() {
+      blockNumber = 104;
+      chainDay = 0;
+      wallets = {
+        admin: { id: 'admin', name: 'Admin (Deployer)', addr: '0xAD01...9001', kyc: true, board: false, balance: 0 },
+        board1: { id: 'board1', name: 'Board Member #1', addr: '0xBD01...2001', kyc: true, board: true, balance: 0 },
+        board2: { id: 'board2', name: 'Board Member #2', addr: '0xBD02...2002', kyc: true, board: true, balance: 0 },
+        board3: { id: 'board3', name: 'Board Member #3', addr: '0xBD03...2003', kyc: true, board: true, balance: 0 },
+        sme: { id: 'sme', name: 'SME Borrower (AgroTech)', addr: '0xSME0...1104', kyc: true, board: false, balance: 2500000 },
+        investor1: { id: 'investor1', name: 'Investor 1 (40% Pool)', addr: '0x1NV1...4001', kyc: true, board: false, balance: 2000000 },
+        investor2: { id: 'investor2', name: 'Investor 2 (60% Pool)', addr: '0x1NV2...6002', kyc: true, board: false, balance: 3000000 },
+        vendor: { id: 'vendor', name: 'Vendor (SolarEquip Ltd)', addr: '0xVEND...8800', kyc: true, board: false, balance: 0 },
+        contract: { id: 'contract', name: 'OpenSpaceMurabaha Pool', addr: '0x05FA...C0DE', kyc: true, board: false, balance: 0 },
+        attacker: { id: 'attacker', name: 'Unverified / Attacker', addr: '0xDEAD...BEEF', kyc: false, board: false, balance: 1000000 }
+      };
+
+      deal = null;
+      eventsLog = [];
+      emitEvent('ContractDeployed', 'OpenSpaceMurabaha(token, [board1,board2,board3], 1000 bps, 7d grace)', 'gold-ev');
+      renderAll();
+    }
+
+    function formatNGN(val) {
+      return '₦' + Number(val).toLocaleString('en-NG');
+    }
+
+    function randomTxHash() {
+      const chars = '0123456789abcdef';
+      let h = '0x';
+      for (let i = 0; i < 12; i++) h += chars[Math.floor(Math.random() * 16)];
+      return h + '...';
+    }
+
+    function showToast(msg, isRevert = false) {
+      const el = document.getElementById('toastBanner');
+      el.textContent = msg;
+      el.className = isRevert ? 'revert' : '';
+      el.style.display = 'block';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.style.display = 'none';
+      }, 4200);
+    }
+
+    function emitEvent(name, detail, type = 'normal') {
+      blockNumber++;
+      eventsLog.unshift({
+        block: blockNumber,
+        name,
+        detail,
+        hash: randomTxHash(),
+        type
+      });
+    }
+
+    function revertTx(reason) {
+      emitEvent('EVM REVERT', `require() failed: "${reason}" (Caller: ${wallets[currentRole].name})`, 'revert');
+      showToast(`Transaction Reverted: ${reason}`, true);
+      renderAll();
+    }
+
+    // ============================================================================
+    // SOLIDITY CONTRACT FUNCTIONS (EXACT LOGIC OF OpenSpaceMurabaha.sol)
+    // ============================================================================
+
+    function txSetKyc(targetKey, statusBool) {
+      if (currentRole !== 'admin') return revertTx('Only admin');
+      wallets[targetKey].kyc = statusBool;
+      emitEvent('KycUpdated', `account=${wallets[targetKey].addr}, approved=${statusBool}`);
+      showToast(`KYC status for ${wallets[targetKey].name} set to ${statusBool}`);
+      renderAll();
+    }
+
+    function txApplyForFinancing(cost, installments, intervalDays, assetRef) {
+      const caller = wallets[currentRole];
+      if (!caller.kyc) return revertTx('KYC required');
+      if (cost <= 0) return revertTx('Cost must be > 0');
+      if (installments <= 0) return revertTx('Installments must be > 0');
+      if (!assetRef || assetRef.trim() === '') return revertTx('Asset reference required');
+
+      deal = {
+        id: 1,
+        sme: 'sme',
+        vendor: 'vendor',
+        cost: Number(cost),
+        total: 0,
+        installments: Number(installments),
+        intervalDays: Number(intervalDays),
+        raised: 0,
+        repaid: 0,
+        paidCount: 0,
+        fundedDay: 0,
+        approvals: 0,
+        status: 'Applied',
+        assetRef: assetRef.trim(),
+        signed: { board1: false, board2: false, board3: false },
+        stake: { investor1: 0, investor2: 0 },
+        claimed: { investor1: 0, investor2: 0 }
+      };
+
+      emitEvent(
+        'Applied(id=1)',
+        `sme=${wallets.sme.addr}, vendor=${wallets.vendor.addr}, cost=${formatNGN(cost)}, installments=${installments}, ref="${assetRef}"`
+      );
+      showToast(`Deal #1 Applied (${formatNGN(cost)} over ${installments} instalments). Awaiting 2/3 Board Approval.`);
+      renderAll();
+    }
+
+    function txApprove() {
+      const caller = wallets[currentRole];
+      if (!caller.board) return revertTx('Only board member');
+      if (!deal) return revertTx('Deal does not exist');
+      if (deal.status !== 'Applied') return revertTx('Not in Applied state');
+      if (deal.signed[currentRole]) return revertTx('Already signed');
+
+      deal.signed[currentRole] = true;
+      deal.approvals += 1;
+      emitEvent('BoardSigned(id=1)', `member=${caller.name}, approvals=${deal.approvals}/${THRESHOLD}`);
+
+      if (deal.approvals >= THRESHOLD) {
+        deal.total = deal.cost + Math.floor((deal.cost * MARKUP_BPS) / 10000);
+        deal.status = 'Approved';
+        emitEvent(
+          'Approved(id=1)',
+          `2-of-3 threshold met! Locked total=${formatNGN(deal.total)} (cost ${formatNGN(deal.cost)} + 10% markup)`,
+          'gold-ev'
+        );
+        showToast(`2nd Board signature recorded! Total locked permanently at ${formatNGN(deal.total)}.`);
+      } else {
+        showToast(`1st Board signature recorded (${caller.name}). Need 1 more board member to lock terms.`);
+      }
+      renderAll();
+    }
+
+    function txReject() {
+      const caller = wallets[currentRole];
+      if (!caller.board) return revertTx('Only board member');
+      if (!deal) return revertTx('Deal does not exist');
+      if (deal.status !== 'Applied') return revertTx('Not in Applied state');
+
+      deal.status = 'Rejected';
+      emitEvent('Rejected(id=1)', `rejectedBy=${caller.name}`, 'revert');
+      showToast(`Deal #1 Rejected by ${caller.name}.`, true);
+      renderAll();
+    }
+
+    function txFund(amount) {
+      const caller = wallets[currentRole];
+      if (!caller.kyc) return revertTx('KYC required');
+      if (!deal) return revertTx('Deal does not exist');
+      if (deal.status !== 'Approved') return revertTx('Deal not open for funding');
+      amount = Number(amount);
+      if (amount <= 0) return revertTx('Amount must be > 0');
+      if (deal.raised + amount > deal.cost) return revertTx('Exceeds asset cost');
+      if (caller.balance < amount) return revertTx('ERC20: transfer amount exceeds balance');
+
+      caller.balance -= amount;
+      wallets.contract.balance += amount;
+      deal.raised += amount;
+      deal.stake[currentRole] = (deal.stake[currentRole] || 0) + amount;
+
+      emitEvent(
+        'Funded(id=1)',
+        `investor=${caller.name}, amount=${formatNGN(amount)}, poolRaised=${formatNGN(deal.raised)}/${formatNGN(deal.cost)}`
+      );
+
+      if (deal.raised === deal.cost) {
+        deal.status = 'Funded';
+        deal.fundedDay = chainDay;
+        // Atomic vendor disbursement
+        wallets.contract.balance -= deal.cost;
+        wallets.vendor.balance += deal.cost;
+        emitEvent(
+          'VendorDisbursed(id=1)',
+          `Pool 100% funded! Contract paid ${formatNGN(deal.cost)} directly to Vendor (${wallets.vendor.addr})`,
+          'gold-ev'
+        );
+        showToast(`Pool 100% Funded! Contract automatically disbursed ${formatNGN(deal.cost)} directly to the Vendor.`);
+      } else {
+        showToast(`Funded ${formatNGN(amount)}. Pool is now at ${formatNGN(deal.raised)} / ${formatNGN(deal.cost)}.`);
+      }
+      renderAll();
+    }
+
+    function txRepay() {
+      if (!deal) return revertTx('Deal does not exist');
+      if (currentRole !== deal.sme) return revertTx('Only deal SME');
+      if (deal.status !== 'Funded') return revertTx('Deal not in Funded state');
+      if (deal.paidCount >= deal.installments) return revertTx('All installments paid');
+
+      let amount;
+      if (deal.paidCount + 1 === deal.installments) {
+        amount = deal.total - deal.repaid; // Clears any integer rounding remainder
+      } else {
+        amount = Math.floor(deal.total / deal.installments);
+      }
+
+      if (wallets.sme.balance < amount) return revertTx('ERC20: insufficient SME balance');
+
+      wallets.sme.balance -= amount;
+      wallets.contract.balance += amount;
+      deal.repaid += amount;
+      deal.paidCount += 1;
+      chainDay += deal.intervalDays;
+
+      emitEvent(
+        'Repaid(id=1)',
+        `instalment=${deal.paidCount}/${deal.installments}, amount=${formatNGN(amount)}, totalRepaid=${formatNGN(deal.repaid)}`
+      );
+
+      if (deal.repaid === deal.total) {
+        deal.status = 'Closed';
+        emitEvent(
+          'Closed(id=1)',
+          `Full obligation (${formatNGN(deal.total)}) repaid! Off-chain asset ownership title released to SME.`,
+          'gold-ev'
+        );
+        showToast(`Final instalment paid! Deal #1 is now Closed and off-chain title transfers to SME.`);
+      } else {
+        showToast(`Instalment ${deal.paidCount}/${deal.installments} (${formatNGN(amount)}) repaid into pool.`);
+      }
+      renderAll();
+    }
+
+    function txClaim() {
+      if (!deal) return revertTx('Deal does not exist');
+      const userStake = deal.stake[currentRole] || 0;
+      if (userStake <= 0) return revertTx('No stake in deal');
+
+      const totalEntitled = Math.floor((deal.repaid * userStake) / deal.cost);
+      const alreadyClaimed = deal.claimed[currentRole] || 0;
+      if (totalEntitled <= alreadyClaimed) return revertTx('Nothing to claim');
+
+      const payout = totalEntitled - alreadyClaimed;
+      deal.claimed[currentRole] = totalEntitled;
+      wallets.contract.balance -= payout;
+      wallets[currentRole].balance += payout;
+
+      emitEvent(
+        'Claimed(id=1)',
+        `investor=${wallets[currentRole].name}, proRataPayout=${formatNGN(payout)}, cumulativeClaimed=${formatNGN(totalEntitled)}`,
+        'gold-ev'
+      );
+      showToast(`${wallets[currentRole].name} claimed ${formatNGN(payout)} pro-rata return!`);
+      renderAll();
+    }
+
+    function txMarkDefault() {
+      const caller = wallets[currentRole];
+      if (!caller.board) return revertTx('Only board member');
+      if (!deal) return revertTx('Deal does not exist');
+      if (deal.status !== 'Funded') return revertTx('Deal not active');
+
+      const nextDueDay = deal.fundedDay + (deal.paidCount + 1) * deal.intervalDays;
+      if (chainDay <= nextDueDay + GRACE_DAYS) {
+        return revertTx(`Grace period not expired (Current: Day ${chainDay}, Due+Grace: Day ${nextDueDay + GRACE_DAYS})`);
+      }
+
+      deal.status = 'Defaulted';
+      emitEvent(
+        'Defaulted(id=1)',
+        `flaggedBy=${caller.name} at Day ${chainDay}. Total owed remains ${formatNGN(deal.total)} (0% penalty interest).`,
+        'revert'
+      );
+      showToast(`Deal #1 flagged as Defaulted after grace period. No compounding penalty added.`, true);
+      renderAll();
+    }
+
+    function advanceClockDays(days) {
+      chainDay += days;
+      emitEvent('TimeAdvanced', `EVM timestamp advanced by +${days} days (Now Day ${chainDay})`);
+      showToast(`Simulated EVM clock advanced +${days} days to Day ${chainDay}.`);
+      renderAll();
+    }
+
+    // ============================================================================
+    // ONE-CLICK 5-MINUTE DEFENSE DEMO AUTOMATION
+    // ============================================================================
+    function runDemoStep(step) {
+      if (step === 1) {
+        initSimulationState();
+        switchRole('sme');
+        txApplyForFinancing(2000000, 4, 30, 'INV-2026-SOLAR-01');
+      } else if (step === 2) {
+        if (!deal) runDemoStep(1);
+        switchRole('board1');
+        txApprove();
+        switchRole('board2');
+        txApprove();
+      } else if (step === 3) {
+        if (!deal || deal.status === 'Applied') runDemoStep(2);
+        switchRole('investor1');
+        txFund(800000);
+        switchRole('investor2');
+        txFund(1200000);
+      } else if (step === 4) {
+        if (!deal || (deal.status !== 'Funded' && deal.status !== 'Closed')) runDemoStep(3);
+        switchRole('sme');
+        txRepay();
+      } else if (step === 5) {
+        if (!deal || deal.repaid === 0) runDemoStep(4);
+        switchRole('investor1');
+        txClaim();
+        switchRole('investor2');
+        txClaim();
+      } else if (step === 6) {
+        switchRole('attacker');
+        txApplyForFinancing(5000000, 4, 30, 'FAKE-INVOICE');
+      }
+    }
+
+    function resetChainSimulation() {
+      initSimulationState();
+      showToast('Blockchain state reset to clean deployment.');
+    }
+
+    function switchRole(roleKey) {
+      currentRole = roleKey;
+      document.querySelectorAll('.role-pill').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('role-' + roleKey);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderAll();
+    }
+
+    // ============================================================================
+    // UI RENDERING
+    // ============================================================================
+    function renderRoleControls() {
+      const container = document.getElementById('roleFunctionsContainer');
+      const w = wallets[currentRole];
+
+      document.getElementById('activeRoleBadge').textContent = w.name;
+      document.getElementById('bannerRoleName').textContent = w.name;
+      document.getElementById('bannerAddress').textContent = w.addr;
+      document.getElementById('bannerBalance').textContent = formatNGN(w.balance);
+
+      const kycBadge = document.getElementById('bannerKycBadge');
+      kycBadge.textContent = w.kyc ? 'KYC Whitelisted' : 'Not KYC Approved';
+      kycBadge.className = 'kyc-tag ' + (w.kyc ? 'yes' : 'no');
+
+      let html = '';
+
+      if (currentRole === 'admin') {
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>setKyc(account, approved)</span><span class="fn-modifier">onlyAdmin</span></div>
+            <div class="fn-desc">Whitelist or revoke KYC status for SME and Investor wallets on-chain.</div>
+            <div class="form-row">
+              <label>Target Wallet</label>
+              <select id="inpKycTarget">
+                <option value="sme">SME Borrower (${wallets.sme.addr}) — KYC: ${wallets.sme.kyc}</option>
+                <option value="investor1">Investor 1 (${wallets.investor1.addr}) — KYC: ${wallets.investor1.kyc}</option>
+                <option value="investor2">Investor 2 (${wallets.investor2.addr}) — KYC: ${wallets.investor2.kyc}</option>
+                <option value="attacker">Unverified Wallet (${wallets.attacker.addr}) — KYC: ${wallets.attacker.kyc}</option>
+              </select>
+            </div>
+            <div class="btn-row-2">
+              <button class="btn-action" onclick="txSetKyc(document.getElementById('inpKycTarget').value, true)">Whitelist (true)</button>
+              <button class="btn-action danger" onclick="txSetKyc(document.getElementById('inpKycTarget').value, false)">Revoke (false)</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (currentRole === 'sme') {
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>applyForFinancing(...)</span><span class="fn-modifier">onlyKyc</span></div>
+            <div class="fn-desc">Submit an asset-backed Murabaha financing request with vendor address &amp; cost.</div>
+            <div class="form-row">
+              <label>Asset Cost (osNGN)</label>
+              <input type="number" id="inpCost" value="2000000" />
+            </div>
+            <div class="form-row">
+              <label>Number of Instalments &amp; Interval (Days)</label>
+              <div class="btn-row-2">
+                <input type="number" id="inpInst" value="4" title="Instalments" />
+                <input type="number" id="inpInterval" value="30" title="Interval in days" />
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Off-Chain Invoice Hash / Asset Ref</label>
+              <input type="text" id="inpAssetRef" value="INV-2026-SOLAR-01" />
+            </div>
+            <button class="btn-action" onclick="txApplyForFinancing(document.getElementById('inpCost').value, document.getElementById('inpInst').value, document.getElementById('inpInterval').value, document.getElementById('inpAssetRef').value)">
+              Submit Financing Application
+            </button>
+          </div>
+
+          <div class="fn-box">
+            <div class="fn-title"><span>repay(1)</span><span class="fn-modifier">onlyDealSME</span></div>
+            <div class="fn-desc">Pay next fixed instalment (${deal && deal.total ? formatNGN(Math.floor(deal.total / deal.installments)) : '₦550,000'}). Final instalment clears any rounding remainder.</div>
+            <button class="btn-action gold" onclick="txRepay()">
+              Pay Next Fixed Instalment
+            </button>
+          </div>
+        `;
+      }
+
+      if (currentRole.startsWith('board')) {
+        const hasSigned = deal && deal.signed[currentRole];
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>approve(1) / reject(1)</span><span class="fn-modifier">onlyBoard</span></div>
+            <div class="fn-desc">2-of-3 Board signatures permanently lock <code>total = cost + 10% markup</code>. You have ${hasSigned ? '<strong>already signed</strong>' : '<strong>not signed yet</strong>'}.</div>
+            <div class="btn-row-2">
+              <button class="btn-action" onclick="txApprove()">Sign approve(1)</button>
+              <button class="btn-action danger" onclick="txReject()">reject(1)</button>
+            </div>
+          </div>
+
+          <div class="fn-box">
+            <div class="fn-title"><span>markDefault(1)</span><span class="fn-modifier">onlyBoard</span></div>
+            <div class="fn-desc">Flag deal as Defaulted if overdue past due date + 7d grace period. Adds <strong>0% penalty interest</strong>.</div>
+            <div class="btn-row-2" style="margin-bottom:0.5rem;">
+              <button class="btn-action gold" onclick="advanceClockDays(40)">+40 Days Clock</button>
+              <button class="btn-action danger" onclick="txMarkDefault()">markDefault(1)</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (currentRole.startsWith('investor')) {
+        const defaultAmt = currentRole === 'investor1' ? 800000 : 1200000;
+        const myStake = deal ? (deal.stake[currentRole] || 0) : 0;
+        const myEntitled = (deal && deal.cost > 0) ? Math.floor((deal.repaid * myStake) / deal.cost) : 0;
+        const myClaimed = deal ? (deal.claimed[currentRole] || 0) : 0;
+        const claimable = Math.max(0, myEntitled - myClaimed);
+
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>fund(1, amount)</span><span class="fn-modifier">onlyKyc</span></div>
+            <div class="fn-desc">Contribute osNGN liquidity to the pool. At 100% of cost, the contract pays the Vendor directly.</div>
+            <div class="form-row">
+              <label>Contribution Amount (osNGN)</label>
+              <input type="number" id="inpFundAmt" value="${defaultAmt}" />
+            </div>
+            <button class="btn-action" onclick="txFund(document.getElementById('inpFundAmt').value)">
+              Fund Deal Pool
+            </button>
+          </div>
+
+          <div class="fn-box">
+            <div class="fn-title"><span>claim(1)</span><span class="fn-modifier">nonReentrant</span></div>
+            <div class="fn-desc">Pull-payment withdrawal of your pro-rata share of repayments. Currently claimable: <strong>${formatNGN(claimable)}</strong></div>
+            <button class="btn-action gold" onclick="txClaim()">
+              Withdraw Pro-Rata Claim (${formatNGN(claimable)})
+            </button>
+          </div>
+        `;
+      }
+
+      if (currentRole === 'vendor') {
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>Direct Vendor Settlement</span><span class="fn-modifier">Passive Recipient</span></div>
+            <div class="fn-desc">
+              As the equipment seller, you do not need to call a claim function. The instant investor funding reaches <code>d.cost</code>, <code>OpenSpaceMurabaha.sol</code> transfers 100% of the asset cost directly to your wallet so the borrower can never divert the cash.
+            </div>
+          </div>
+        `;
+      }
+
+      if (currentRole === 'attacker') {
+        html += `
+          <div class="fn-box">
+            <div class="fn-title"><span>Security &amp; Tamper Testing</span><span class="fn-modifier">Adversarial Caller</span></div>
+            <div class="fn-desc">Demonstrate for your defense how unauthorized calls immediately revert on-chain:</div>
+            <div style="display:flex; flex-direction:column; gap:0.45rem;">
+              <button class="btn-action danger" onclick="txApplyForFinancing(1000000, 4, 30, 'UNAUTH-REF')">
+                Try applyForFinancing() without KYC
+              </button>
+              <button class="btn-action danger" onclick="txApprove()">
+                Try approve(1) as Non-Board Member
+              </button>
+              <button class="btn-action danger" onclick="txFund(500000)">
+                Try fund(1) without KYC Whitelist
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderDealInspector() {
+      const states = ['Applied', 'Approved', 'Funded', 'Closed', 'Defaulted', 'Rejected'];
+      states.forEach(s => {
+        const el = document.getElementById('st-' + s);
+        el.classList.remove('active', 'danger-active');
+        if (deal && deal.status === s) {
+          if (s === 'Defaulted' || s === 'Rejected') {
+            el.classList.add('danger-active');
+          } else {
+            el.classList.add('active');
+          }
+        }
+      });
+
+      document.getElementById('blockNumDisplay').textContent = '#' + blockNumber;
+      document.getElementById('clockDisplay').textContent = 'Day ' + chainDay;
+
+      if (!deal) {
+        document.getElementById('dealAssetRefTag').textContent = 'No Active Deal';
+        document.getElementById('mCost').textContent = '₦0';
+        document.getElementById('mTotal').textContent = '₦0';
+        document.getElementById('mOutstanding').textContent = '₦0';
+        document.getElementById('mInstalmentSub').textContent = '0 / 0 Instalments Paid';
+        document.getElementById('fundingProgressText').textContent = '₦0 / ₦0 (0%)';
+        document.getElementById('fundingProgressBar').style.width = '0%';
+        document.getElementById('repayProgressText').textContent = '₦0 / ₦0 (0%)';
+        document.getElementById('repayProgressBar').style.width = '0%';
+        document.getElementById('tbSmeVendor').textContent = '—';
+        document.getElementById('tbApprovals').textContent = '0 / 2 signatures';
+        document.getElementById('tbInstallments').textContent = '0 / 0';
+        document.getElementById('tbInv1').textContent = 'Stake: ₦0 | Claimed: ₦0';
+        document.getElementById('tbInv1Entitled').textContent = '₦0';
+        document.getElementById('tbInv2').textContent = 'Stake: ₦0 | Claimed: ₦0';
+        document.getElementById('tbInv2Entitled').textContent = '₦0';
+        document.getElementById('tbDueGrace').textContent = '—';
+        document.getElementById('offTitleStatus').textContent = 'Awaiting Deal Creation';
+        return;
+      }
+
+      document.getElementById('dealAssetRefTag').textContent = `Deal #1 • ${deal.assetRef}`;
+      document.getElementById('offAssetRef').textContent = deal.assetRef;
+      document.getElementById('mCost').textContent = formatNGN(deal.cost);
+      document.getElementById('mTotal').textContent = deal.total > 0 ? formatNGN(deal.total) : 'Pending 2/3 Board';
+      const out = deal.total > deal.repaid ? deal.total - deal.repaid : 0;
+      document.getElementById('mOutstanding').textContent = formatNGN(out);
+      document.getElementById('mInstalmentSub').textContent = `${deal.paidCount} / ${deal.installments} Instalments Paid`;
+
+      const fundPct = deal.cost > 0 ? Math.min(100, Math.round((deal.raised / deal.cost) * 100)) : 0;
+      document.getElementById('fundingProgressText').textContent = `${formatNGN(deal.raised)} / ${formatNGN(deal.cost)} (${fundPct}%)`;
+      document.getElementById('fundingProgressBar').style.width = fundPct + '%';
+
+      const repayPct = deal.total > 0 ? Math.min(100, Math.round((deal.repaid / deal.total) * 100)) : 0;
+      document.getElementById('repayProgressText').textContent = `${formatNGN(deal.repaid)} / ${formatNGN(deal.total)} (${repayPct}%)`;
+      document.getElementById('repayProgressBar').style.width = repayPct + '%';
+
+      document.getElementById('tbSmeVendor').textContent = `${wallets.sme.addr} → ${wallets.vendor.addr}`;
+      const signedList = Object.entries(deal.signed).filter(([, v]) => v).map(([k]) => k).join(', ') || 'none';
+      document.getElementById('tbApprovals').textContent = `${deal.approvals} / ${THRESHOLD} (${signedList})`;
+      document.getElementById('tbInstallments').textContent = `${deal.paidCount} / ${deal.installments} (every ${deal.intervalDays}d)`;
+
+      const ent1 = deal.cost > 0 ? Math.floor((deal.repaid * deal.stake.investor1) / deal.cost) : 0;
+      const ent2 = deal.cost > 0 ? Math.floor((deal.repaid * deal.stake.investor2) / deal.cost) : 0;
+      document.getElementById('tbInv1').textContent = `Stake: ${formatNGN(deal.stake.investor1)} | Claimed: ${formatNGN(deal.claimed.investor1)}`;
+      document.getElementById('tbInv1Entitled').textContent = formatNGN(ent1);
+      document.getElementById('tbInv2').textContent = `Stake: ${formatNGN(deal.stake.investor2)} | Claimed: ${formatNGN(deal.claimed.investor2)}`;
+      document.getElementById('tbInv2Entitled').textContent = formatNGN(ent2);
+
+      if (deal.status === 'Funded' || deal.status === 'Defaulted') {
+        const nextDue = deal.fundedDay + (deal.paidCount + 1) * deal.intervalDays;
+        document.getElementById('tbDueGrace').textContent = `Due Day ${nextDue} | Default Eligible > Day ${nextDue + GRACE_DAYS}`;
+      } else {
+        document.getElementById('tbDueGrace').textContent = deal.status === 'Closed' ? 'Settled in Full' : 'Awaiting Funding';
+      }
+
+      const titleEl = document.getElementById('offTitleStatus');
+      if (deal.status === 'Closed') {
+        titleEl.textContent = 'TRANSFERRED TO SME (Closed Event Fired)';
+        titleEl.style.color = 'var(--os-green)';
+      } else if (deal.status === 'Defaulted') {
+        titleEl.textContent = 'FROZEN — Off-Chain Asset Recovery Initiated';
+        titleEl.style.color = 'var(--os-red)';
+      } else {
+        titleEl.textContent = 'Held in Escrow until Closed(1) Event';
+        titleEl.style.color = 'var(--os-gold-dark)';
+      }
+    }
+
+    function renderWalletsAndEvents() {
+      const wList = document.getElementById('walletBalancesList');
+      const displayOrder = ['contract', 'vendor', 'sme', 'investor1', 'investor2', 'board1', 'board2', 'admin', 'attacker'];
+      wList.innerHTML = displayOrder.map(key => {
+        const w = wallets[key];
+        const isCur = key === currentRole;
+        return `
+          <div class="wallet-item ${isCur ? 'current' : ''}">
+            <div class="w-left">
+              <div class="w-name">
+                ${w.name}
+                ${key !== 'contract' ? `<span class="kyc-tag ${w.kyc ? 'yes' : 'no'}">${w.kyc ? 'KYC' : 'No-KYC'}</span>` : ''}
+              </div>
+              <div style="font-family:Consolas,monospace; font-size:0.72rem; color:var(--os-muted);">${w.addr}</div>
+            </div>
+            <div style="font-weight:700; color:var(--os-green); font-family:Consolas,monospace;">
+              ${formatNGN(w.balance)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('eventCountTag').textContent = `${eventsLog.length} Events`;
+      const evContainer = document.getElementById('eventStreamContainer');
+      evContainer.innerHTML = eventsLog.map(ev => `
+        <div class="event-card ${ev.type === 'revert' ? 'revert' : (ev.type === 'gold-ev' ? 'gold-ev' : '')}">
+          <div class="ev-top">
+            <span>${ev.name}</span>
+            <span>Block #${ev.block}</span>
+          </div>
+          <div class="ev-detail">${ev.detail}</div>
+          <div class="ev-hash">txHash: ${ev.hash}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderAll() {
+      renderRoleControls();
+      renderDealInspector();
+      renderWalletsAndEvents();
+    }
+
+    async function connectMetaMask() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const shortAddr = accounts[0].slice(0, 6) + '...' + accounts[0].slice(-4);
+          document.getElementById('btnConnectWallet').textContent = 'Connected: ' + shortAddr;
+          showToast('Connected to browser Web3 provider (' + shortAddr + ') via ethers.js');
+        } catch (err) {
+          showToast('MetaMask connection cancelled; running in local EVM simulation mode.', true);
+        }
+      } else {
+        showToast('Running in deterministic local EVM simulation mode (no browser wallet extension needed).');
+      }
+    }
+
+    // Initialize on load and pre-populate the ₦2,000,000 worked example at Step 1
+    window.addEventListener('DOMContentLoaded', () => {
+      initSimulationState();
+    });
+  </script>
+</body>
+
+</html>
