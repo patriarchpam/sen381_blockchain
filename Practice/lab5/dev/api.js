@@ -21,6 +21,7 @@ app.get('/blockchain', function (req, res) {
 
 // Endpoint 2: Create a new transaction in pending transactions
 app.post('/transaction', function (req, res) {
+    console.log(req.body);
     const blockIndex = bitcoin.createNewTransaction(
         req.body.amount,
         req.body.sender,

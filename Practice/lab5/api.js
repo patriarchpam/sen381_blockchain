@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Home endpoint for testing
 app.get('/', function (req, res) {
-    res.send('Welcome to the Blockchain API (Lab 5)');
+    res.send('Hello Yeips');
 });
 
 // Endpoint 1: Fetch the entire blockchain
@@ -21,6 +21,7 @@ app.get('/blockchain', function (req, res) {
 
 // Endpoint 2: Create a new transaction in pending transactions
 app.post('/transaction', function (req, res) {
+    console.log(req.body);
     const blockIndex = bitcoin.createNewTransaction(
         req.body.amount,
         req.body.sender,
