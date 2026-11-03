@@ -8,22 +8,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
   <style>
     :root {
-      --os-green: #123B2E;
-      --os-green-dark: #0c2920;
-      --os-green-mid: #1c5443;
-      --os-gold: #E0B04F;
-      --os-gold-dark: #B8892B;
-      --os-cream: #FBF3DD;
-      --os-bg: #F3F5F1;
-      --os-card-alt: #E8EDE9;
-      --os-border: #D3DCD5;
-      --os-text: #1D2A26;
-      --os-muted: #5D6B65;
+      --os-green: #2B5E26;
+      --os-green-dark: #1B3E17;
+      --os-green-mid: #387632;
+      --os-lime: #CADB2A;
+      --os-lime-dark: #9EB014;
+      --os-gold: #CADB2A;
+      --os-gold-dark: #6D7D0B;
+      --os-cream: #F7FAE6;
+      --os-bg: #F3F6F2;
+      --os-card-alt: #E7EFE6;
+      --os-border: #CFDDD0;
+      --os-text: #1A2B18;
+      --os-muted: #536651;
       --os-red: #A63A2A;
       --os-red-bg: #fdedea;
       --os-white: #FFFFFF;
-      --shadow-sm: 0 2px 8px rgba(18, 59, 46, 0.06);
-      --shadow-md: 0 6px 20px rgba(18, 59, 46, 0.10);
+      --shadow-sm: 0 2px 8px rgba(27, 62, 23, 0.06);
+      --shadow-md: 0 6px 20px rgba(27, 62, 23, 0.12);
       --radius: 10px;
     }
 
@@ -76,19 +78,21 @@
       gap: 1rem;
     }
 
-    .brand-emblem {
-      width: 46px;
-      height: 46px;
+    .brand-logo-wrap {
+      background: var(--os-white);
+      padding: 0.45rem 0.9rem;
       border-radius: 10px;
-      background: var(--os-gold);
-      color: var(--os-green);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Georgia', serif;
-      font-weight: bold;
-      font-size: 1.45rem;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+      border: 2px solid var(--os-lime);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    .brand-logo-img {
+      height: 38px;
+      width: auto;
+      display: block;
     }
 
     .brand-titles h1 {
@@ -871,7 +875,9 @@
   <header>
     <div class="header-top">
       <div class="brand-group">
-        <div class="brand-emblem">OS</div>
+        <div class="brand-logo-wrap">
+          <img src="Open-Spcae-Logo2-1.png" alt="OpenSpace Finance Logo" class="brand-logo-img" />
+        </div>
         <div class="brand-titles">
           <h1>
             OpenSpace Ledger
