@@ -1,0 +1,23 @@
+{
+  "name": "lab7",
+  "version": "1.0.0",
+  "main": "dev/verinetworkNode.js",
+  "scripts": {
+    "start": "nodemon --watch dev -e js dev/verinetworkNode.js 3001 http://localhost:3001",
+    "node_1": "nodemon --watch dev -e js dev/verinetworkNode.js 3001 http://localhost:3001",
+    "node_2": "nodemon --watch dev -e js dev/verinetworkNode.js 3002 http://localhost:3002",
+    "node_3": "nodemon --watch dev -e js dev/verinetworkNode.js 3003 http://localhost:3003",
+    "node_4": "nodemon --watch dev -e js dev/verinetworkNode.js 3004 http://localhost:3004",
+    "node_5": "nodemon --watch dev -e js dev/verinetworkNode.js 3005 http://localhost:3005",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.14",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "sha256": "^0.2.0",
+    "uuid": "^3.4.0"
+  }
+}
