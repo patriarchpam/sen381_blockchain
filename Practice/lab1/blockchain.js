@@ -1,8 +1,8 @@
 class Blockchain {
     constructor() {
-        this.chain=[];
-        this.newTransaction=[];
-        
+        this.chain = [];
+        this.newTransaction = [];
+
     }
 }
 
@@ -11,39 +11,38 @@ Blockchain.prototype.createNewBlock = function (
     previousBlockHash,
     hash
 ) {
-    const newBlock={
-        index:this.chain.length+1,
-        timesstamp:Date.now(),
-        transactions:this.newTransaction,
-        nonce:nonce,
-        hash:hash,
-        previousBlockHash:previousBlockHash,
+    const newBlock = {
+        index: this.chain.length + 1,
+        timesstamp: Date.now(),
+        transactions: this.newTransaction,
+        nonce: nonce,
+        hash: hash,
+        previousBlockHash: previousBlockHash,
     };
-    this.newTransaction=[];
+    this.newTransaction = [];
     this.chain.push(newBlock);
     return newBlock;
-    
+
 };
 
-Blockchain.prototype.getLastBlock=function(){
-    return this.chain[this.chain.length-1];
+Blockchain.prototype.getLastBlock = function () {
+    return this.chain[this.chain.length - 1];
 };
-Blockchain.prototype.createNewTransaction=function(
+Blockchain.prototype.createNewTransaction = function (
     amount,
     sender,
     recipient
 
-){
-    const newTransaction={
+) {
+    const newTransaction = {
 
-    
-    amount:amount,
-    sender:sender,
-    recipient:recipient
+
+        amount: amount,
+        sender: sender,
+        recipient: recipient
     };
     this.newTransaction.push(newTransaction);
     return this.getLastBlock();
 
 };
-
-module.exports=Blockchain;
+module.exports = Blockchain;
